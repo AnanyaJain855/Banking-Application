@@ -1,0 +1,170 @@
+//CODE
+import java.util.Scanner;
+
+class BankAccount {
+    int balance;
+    int previousTransaction;
+    String customerName;
+    String customerId;
+
+    // Constructor
+    BankAccount(String cname, String cid) {
+        customerName = cname;
+        customerId = cid;
+    }
+
+    void deposit(int amount) {
+        if (amount != 0) {
+            balance = balance + amount;
+            previousTransaction = amount;
+        }
+    }
+
+    void withdraw(int amount) {
+        if (amount != 0) {
+            balance = balance - amount;
+            previousTransaction = -amount;
+        }
+    }
+
+    void getPreviousTransaction() {
+        if (previousTransaction > 0) {
+            System.out.println("Deposited: " + previousTransaction);
+        } else if (previousTransaction < 0) {
+            System.out.println("Withdrawn: " + (-previousTransaction));
+        } else {
+            System.out.println("No transaction was made");
+        }
+    }
+
+    void calculateInterest(int years) {
+        double interestRate = 0.05; // Example interest rate
+        double newBalance = (balance * interestRate * years) + balance;
+        System.out.println("The current interest rate is " + (100 * interestRate) + "%");
+        System.out.println("After " + years + " years, your balance will be: " + newBalance);
+    }
+
+    void transfer(BankAccount recipient, int amount) {
+        if (amount != 0 && balance >= amount) {
+            this.balance -= amount;
+            recipient.balance += amount;
+            this.previousTransaction = -amount;
+            recipient.previousTransaction = amount;
+            System.out.println("Transferred " + amount + " to " + recipient.customerName);
+        } else {
+            System.out.println("Transfer failed due to insufficient balance.");
+        }
+    }
+
+    void showMenu(BankAccount[] accounts) {
+        char option = '\0';
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Welcome " + customerName);
+        System.out.println("Your customer ID is " + customerId);
+        System.out.println();
+        System.out.println("A. Check balance");
+        System.out.println("B. Deposit");
+        System.out.println("C. Withdraw");
+        System.out.println("D. Previous transaction");
+        System.out.println("E. Transfer");
+        System.out.println("F. Calculate interest");
+        System.out.println("G. Exit");
+
+        do {
+            System.out.println("===========================");
+            System.out.println("Enter the option");
+            System.out.println("===========================");
+            option = sc.next().charAt(0);
+            option = Character.toUpperCase(option);
+
+            switch (option) {
+                case 'A':
+                    System.out.println("===========================");
+                    System.out.println("Balance is " + balance);
+                    System.out.println("===========================");
+                    System.out.println();
+                    break;
+
+                case 'B':
+                    System.out.println("===========================");
+                    System.out.println("Enter the amount to be deposited: ");
+                    System.out.println("===========================");
+                    int amount = sc.nextInt();
+                    deposit(amount);
+                    System.out.println();
+                    break;
+
+                case 'C':
+                    System.out.println("===========================");
+                    System.out.println("Enter the amount to withdraw: ");
+                    System.out.println("===========================");
+                    int amount2 = sc.nextInt();
+                    withdraw(amount2);
+                    System.out.println();
+                    break;
+
+                case 'D':
+                    System.out.println("===========================");
+                    getPreviousTransaction();
+                    System.out.println("===========================");
+                    System.out.println();
+                    break;
+
+                case 'E':
+                    System.out.println("===========================");
+                    System.out.println("Enter amount to transfer: ");
+                    int transferAmount = sc.nextInt();
+                    System.out.println("Enter recipient customer ID: ");
+                    String recipientId = sc.next();
+                    BankAccount recipient = getAccountById(accounts, recipientId);
+                    if (recipient != null) {
+                        transfer(recipient, transferAmount);
+                    } else {
+                        System.out.println("Recipient not found.");
+                    }
+                    System.out.println("===========================");
+                    break;
+
+                case 'F':
+                    System.out.println("===========================");
+                    System.out.println("Enter the number of years: ");
+                    int years = sc.nextInt();
+                    calculateInterest(years);
+                    System.out.println("===========================");
+                    break;
+
+                case 'G':
+                    System.out.println("===========================");
+                    System.out.println("Exiting...");
+                    System.out.println("===========================");
+                    break;
+
+                default:
+                    System.out.println("Invalid option! Please try again.");
+                    break;
+            }
+        } while (option != 'G');
+        sc.close();
+    }
+
+    // Helper method to get account by ID
+    BankAccount getAccountById(BankAccount[] accounts, String customerId) {
+        for (BankAccount account : accounts) {
+            if (account.customerId.equals(customerId)) {
+                return account;
+            }
+        }
+        return null;
+    }
+}
+
+public class BankingApplication {
+    public static void main(String[] args) {
+        BankAccount bank1 = new BankAccount("XYZ", "01");
+        BankAccount bank2 = new BankAccount("ABC", "02");
+
+        BankAccount[] accounts = {bank1, bank2};
+
+        bank1.showMenu(accounts);
+    }
+}
